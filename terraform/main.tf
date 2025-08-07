@@ -1,3 +1,8 @@
+provider "aws" {
+   region = "us-east-1"
+   profile = "default"
+}
+
 resource "aws_s3_bucket" "cicd_terraform" {
     bucket = var.bucket_name
 
