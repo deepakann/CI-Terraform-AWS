@@ -3,7 +3,10 @@ pipeline {
 
     environment {
         AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')    
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        INVENTORY_FILE = 'inventory.ini'
+        PLAYBOOK_FILE = 'install_docker.yaml'
+        PEM_FILE = credentials('ansible-ssh-key')
     }
 
     stages {
@@ -12,6 +15,14 @@ pipeline {
                checkout scm
             } 
         }
+
+        stage ('Run Ansible Playbook') {
+            steps{
+                sh """
+                    chmod 600 $PEM_FILE
+                    ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE} --private-file=${PEM_FILE}
+                }
+         }           
         stage ('Initialize Terraform Code') {
             steps{
                dir('terraform') {
