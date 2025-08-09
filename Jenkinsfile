@@ -30,7 +30,7 @@ pipeline {
 
         stage('Ping localhost') {
             steps {
-                ansible -i inventory.ini --list-hosts all
+                sh "ansible -i ${INVENTORY_FILE} --list-hosts all"
                 sh "ansible -i ${INVENTORY_FILE} all -m ping"
             }
         }
