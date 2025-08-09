@@ -20,7 +20,8 @@ pipeline {
             steps{
                 sh """
                     chmod 600 $PEM_FILE
-                    ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE} --private-file=${PEM_FILE}
+                    ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE} --private-key $PEM_FILE
+                """    
                 }
          }           
         stage ('Initialize Terraform Code') {
