@@ -18,11 +18,13 @@ pipeline {
 
         stage ('Run Ansible Playbook') {
             steps{
-                sh """
+                withCredentials([sshUserPrivateKey(credentialsId: 'ansible-ssh-key', keyFileVariable: 'PEM_FILE')]) {
+                sh '''
                     chmod 600 $PEM_FILE
-                    ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE} --private-key $PEM_FILE
-                """    
+                    ansible-playbook -i "$INVENTORY_FILE $PLAYBOOK_FILE --private-key=$PEM_FILE
+                '''
                 }
+            }
          }           
         stage ('Initialize Terraform Code') {
             steps{
