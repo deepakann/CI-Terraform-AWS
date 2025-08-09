@@ -16,7 +16,7 @@ pipeline {
             } 
         }
 
-        stage ('Run Ansible Playbook') {
+        /* stage ('Run Ansible Playbook') {
             steps{
                 withCredentials([file(credentialsId: 'ansible-ssh-key', variable: 'PEM_FILE')]) {
                 sh '''
@@ -26,7 +26,20 @@ pipeline {
                 '''
                 }
             }
-         }           
+         }  */
+
+        stage('Ping localhost') {
+            steps {
+                sh "ansible -i ${INVENTORY_FILE} local -m ping"
+            }
+        }
+
+        stage('Run Ansible Playbook') {
+            steps {
+                sh "ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE}"
+            }
+        }    
+        
         stage ('Initialize Terraform Code') {
             steps{
                dir('terraform') {
