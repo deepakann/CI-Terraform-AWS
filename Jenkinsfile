@@ -18,7 +18,7 @@ pipeline {
 
         stage ('Run Ansible Playbook') {
             steps{
-                withCredentials([file(credentialsId: 'ansible-ssh-key', keyFileVariable: 'PEM_FILE')]) {
+                withCredentials([file(credentialsId: 'ansible-ssh-key', Variable: 'PEM_FILE')]) {
                 sh '''
                     chmod 600 $PEM_FILE
                     ansible-playbook -i "$INVENTORY_FILE $PLAYBOOK_FILE --private-key=$PEM_FILE
