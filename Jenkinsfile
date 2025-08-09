@@ -21,7 +21,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'ansible-ssh-key', variable: 'PEM_FILE')]) {
                 sh '''
                     chmod 600 "$PEM_FILE"
-                    ansible-playbook -i "$INVENTORY_FILE" -m ping
+                    ansible all -i "$INVENTORY_FILE" -m ping
                     ansible-playbook -i "$INVENTORY_FILE" "$PLAYBOOK_FILE" --private-key="$PEM_FILE"
                 '''
                 }
