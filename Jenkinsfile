@@ -4,7 +4,6 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-        INVENTORY_FILE = 'inventory.ini'
         PLAYBOOK_FILE = 'install_docker.yaml'
         PEM_FILE = credentials('ansible-ssh-key')
     }
@@ -16,36 +15,54 @@ pipeline {
             } 
         }
 
-        /* stage ('Run Ansible Playbook') {
-            steps{
-                withCredentials([file(credentialsId: 'ansible-ssh-key', variable: 'PEM_FILE')]) {
-                sh '''
-                    chmod 600 "$PEM_FILE"
-                    ansible all -i "$INVENTORY_FILE" -m ping
-                    ansible-playbook -i "$INVENTORY_FILE" "$PLAYBOOK_FILE" --private-key="$PEM_FILE"
-                '''
-                }
-            }
-         }  */
-
         stage('Check User') {
             steps {
-                sh 'whoami'
+               sh 'whoami'
             }
         }
 
-        stage('Ping localhost') {
+        stage ('Run Ansible Playbook') {
+            steps{
+                withCredentials([file(credentialsId: 'ansible-ssh-key', variable: 'PEM_FILE')]) {
+                  sh '''
+                    set -e  # Fail if any command fails
+                    chmod 600 \$PEM_FILE
+
+                    # Get the public IP of the EC2 instance using AWS CLI and a tag or name filter
+                    INSTANCE_ID=$(aws ec2 describe-instances \
+                    --filters "Name=tag:Name=Values="CICDServer" "Name=instance-state-name,Values=running" \
+                    --query "Reservations[0].Instances[0].InstanceID" --output text)
+
+                    PUBLIC_IP=$(aws ec2 describe-instances \
+                    --instance-ids $INSTANCE_ID \
+                    --query "Reservations[0].Instances[0].PublicIpAddress" \
+                    --output text)
+
+                    echo "[all]" > inventory.ini
+                    echo "target1 ansible_host=\${PUBLIC_IP} ansible_user=ubuntu ansible_ssh_private_key_file=\$PEM_FILE" >> inventory.ini
+
+                    echo "Pinging EC2 Instance.."
+                    ansible - inventory.ini all -m ping
+
+                    echo "Running Ansible Playbook to install Docker.."
+                    ansible-playbook -i inventory.ini \${PLAYBOOK_FILE} --private-key \$PEM_FILE 
+                  '''
+                }
+            }
+         } 
+
+        /* stage('Ping localhost') {
             steps {
                 sh "ansible -i ${INVENTORY_FILE} --list-hosts all"
                 sh "ansible -i ${INVENTORY_FILE} all -m ping"
             }
-        }
+        } */
 
-        stage('Run Ansible Playbook') {
+        /* stage('Run Ansible Playbook') {
             steps {
                 sh "ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE} --become"
             }
-        }    
+        } */   
         
         stage ('Initialize Terraform Code') {
             steps{
