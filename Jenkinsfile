@@ -43,7 +43,7 @@ pipeline {
 
         stage('Run Ansible Playbook') {
             steps {
-                sh "ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE}"
+                sh "ansible-playbook -i ${INVENTORY_FILE} ${PLAYBOOK_FILE} --become"
             }
         }    
         
