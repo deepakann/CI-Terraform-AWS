@@ -28,6 +28,12 @@ pipeline {
             }
          }  */
 
+        stage('Check User') {
+            steps {
+                sh 'whoami'
+            }
+        }
+
         stage('Ping localhost') {
             steps {
                 sh "ansible -i ${INVENTORY_FILE} --list-hosts all"
