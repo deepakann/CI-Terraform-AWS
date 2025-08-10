@@ -6,6 +6,8 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
         PLAYBOOK_FILE = 'install_docker.yaml'
         PEM_FILE = credentials('ansible-ssh-key')
+        SECRET_NAME = 'docker_credentials'
+        REGION = 'us-eadt-1'
     }
 
     stages {
@@ -49,8 +51,39 @@ pipeline {
                   '''
                 }
             }
-         } 
+         }
 
+        stage("Docker Login'){
+            steps{
+                script{
+                    // Fetch secret from AWS Secrets Manager
+                    def dockerCreds = sh(
+                        script:"aws secretsmanager get-secret-value --secret-id ${SECRET_NAME} --region ${REGION} --query SecretString --output text";
+                        returnStdout: true
+                    ).trim()
+
+                    // Parse the JSON String via Secrets Manager
+                    def creds = readJSON text: dockerCreds
+                    def username = creds.username
+                    def password = creds.password
+
+                    //Perform secure Docker Login using password
+                    sh """
+                        echo "${password}" |  docker login -u "${username} --pasword-stdin
+                    """
+                } 
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            steps{
+                sh ""
+                    docekr build -t ${username}/myapp:latest .
+                    docker push ${username}/myapp:latest
+                ""    
+                }
+            }
+              
         /* stage('Ping localhost') {
             steps {
                 sh "ansible -i ${INVENTORY_FILE} --list-hosts all"
