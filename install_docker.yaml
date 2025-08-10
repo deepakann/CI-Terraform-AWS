@@ -41,5 +41,17 @@
         name: ubuntu
         groups: docker
         append: yes
-        
-        
+
+    - name: check ubuntu user groups
+      ansible.builtin.command: groups ubuntu
+      register: ubuntu_groups
+
+    - name: Show ubuntu user groups
+      ansible.builtin.debug:
+      msg: "Ubuntu user belogs to groups: {{ ubuntu_groups.stdout }}"
+
+    - name: Reboot the server to apply group changes
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible after Docker Installation"
+        connect_timeout: 5
+        reboot_timeout: 300
