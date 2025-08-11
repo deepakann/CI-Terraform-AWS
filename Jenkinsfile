@@ -68,19 +68,19 @@ pipeline {
                     def password = creds.password
 
                     //Perform secure Docker Login using password
-                    sh """
+                    sh '''
                         echo "${password}" |  docker login -u "${username} --pasword-stdin
-                    """
+                    '''
                 } 
             }
         }
 
         stage ('Build and Push Docker Image') {
             steps{
-                sh ""
+                sh '''
                     docker build -t ${username}/myapp:latest .
                     docker push ${username}/myapp:latest
-                ""    
+                '''
                 }
             }
               
