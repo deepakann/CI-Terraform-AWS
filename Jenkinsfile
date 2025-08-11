@@ -32,8 +32,8 @@ pipeline {
 
                     # Get the public IP of the EC2 instance using AWS CLI and a tag or name filter
                     INSTANCE_ID=$(aws ec2 describe-instances \
-                    --filters "Name=tag:Name=Values=CICDServer" "Name=instance-state-name,Values=running" \
-                    --query "Reservations[0].Instances[0].InstanceId" --output text)
+                    --filters "Name=tag:Name,Values=CICDServer" "Name=instance-state-name,Values=running" \
+                    --query "Reservations[0].Instances[0].InstanceId" --output text )
 
                     PUBLIC_IP=$(aws ec2 describe-instances \
                     --instance-ids $INSTANCE_ID \
