@@ -58,7 +58,7 @@ pipeline {
                 script{
                     // Fetch secret from AWS Secrets Manager
                     def dockerCreds = sh(
-                        script:"aws secretsmanager get-secret-value --secret-id ${SECRET_NAME} --region ${REGION} --query SecretString --output text";
+                        script:"aws secretsmanager get-secret-value --secret-id ${SECRET_NAME} --region ${REGION} --query SecretString --output text",
                         returnStdout: true
                     ).trim()
 
