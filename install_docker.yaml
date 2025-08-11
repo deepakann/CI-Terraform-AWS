@@ -48,4 +48,4 @@
 
     - name: Show ubuntu user groups
       ansible.builtin.debug:
-      msg: "Ubuntu user belogs to groups: {{ ubuntu_groups.stdout }}"
+        msg: "Ubuntu user belogs to groups: {{ ubuntu_groups.stdout }}"
