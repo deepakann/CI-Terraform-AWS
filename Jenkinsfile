@@ -7,7 +7,7 @@ pipeline {
         PLAYBOOK_FILE = 'install_docker.yaml'
         PEM_FILE = credentials('ansible-ssh-key')
         SECRET_NAME = 'docker_credentials'
-        REGION = 'us-eadt-1'
+        REGION = 'us-east-1'
     }
 
     stages {
@@ -78,7 +78,7 @@ pipeline {
         stage('Build and Push Docker Image') {
             steps{
                 sh ""
-                    docekr build -t ${username}/myapp:latest .
+                    docker build -t ${username}/myapp:latest .
                     docker push ${username}/myapp:latest
                 ""    
                 }
