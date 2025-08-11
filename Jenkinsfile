@@ -4,6 +4,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
         AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        ANSIBLE_HOST_KEY_CHECKING = 'False'
         PLAYBOOK_FILE = 'install_docker.yaml'
         PEM_FILE = credentials('ansible-ssh-key')
         SECRET_NAME = 'docker_credentials'
