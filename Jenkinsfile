@@ -53,7 +53,7 @@ pipeline {
             }
          }
 
-        stage ("Docker Login') {
+        stage ('Docker Login') {
             steps{
                 script{
                     // Fetch secret from AWS Secrets Manager
