@@ -32,8 +32,8 @@ pipeline {
 
                     # Get the public IP of the EC2 instance using AWS CLI and a tag or name filter
                     INSTANCE_ID=$(aws ec2 describe-instances \
-                    --filters "Name=tag:Name=Values="CICDServer" "Name=instance-state-name,Values=running" \
-                    --query "Reservations[0].Instances[0].InstanceID" --output text)
+                    --filters "Name=tag:Name=Values=CICDServer" "Name=instance-state-name,Values=running" \
+                    --query "Reservations[0].Instances[0].InstanceId" --output text)
 
                     PUBLIC_IP=$(aws ec2 describe-instances \
                     --instance-ids $INSTANCE_ID \
@@ -44,7 +44,7 @@ pipeline {
                     echo "target1 ansible_host=\${PUBLIC_IP} ansible_user=ubuntu ansible_ssh_private_key_file=\$PEM_FILE" >> inventory.ini
 
                     echo "Pinging EC2 Instance.."
-                    ansible - inventory.ini all -m ping
+                    ansible -i inventory.ini all -m ping
 
                     echo "Running Ansible Playbook to install Docker.."
                     ansible-playbook -i inventory.ini \${PLAYBOOK_FILE} --private-key \$PEM_FILE 
@@ -64,12 +64,12 @@ pipeline {
 
                     // Parse the JSON String via Secrets Manager
                     def creds = readJSON text: dockerCreds
-                    def username = creds.username
-                    def password = creds.password
+                    env.DOCKER_USERNAME = creds.username
+                    env.DOCKER_PASSWORD = creds.password
 
                     //Perform secure Docker Login using password
                     sh '''
-                        echo "${password}" |  docker login -u "${username} --pasword-stdin
+                        echo "${DOCKER_PASSWORD}" |  docker login -u "${DOCKER_USERNAME}" --password-stdin
                     '''
                 } 
             }
@@ -78,8 +78,8 @@ pipeline {
         stage ('Build and Push Docker Image') {
             steps{
                 sh '''
-                    docker build -t ${username}/myapp:latest .
-                    docker push ${username}/myapp:latest
+                    docker build -t ${DOCKER_USERNAME}/myapp:latest .
+                    docker push ${DOCKER_USERNAME}/myapp:latest
                 '''
                 }
             }
