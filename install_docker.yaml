@@ -38,14 +38,29 @@
 
     - name: Add ubuntu user to docker group
       ansible.builtin.user:
-        name: ubuntu
+        name: "{{ item }}"
         groups: docker
         append: yes
+      loop:
+        - ubuntu
+        - jenkins
 
     - name: check ubuntu user groups
-      ansible.builtin.command: groups ubuntu
-      register: ubuntu_groups
+      ansible.builtin.command: "groups {{ item }}"
+      register: user_groups
+      loop:
+        - ubuntu
+        - jenkins
 
-    - name: Show ubuntu user groups
+    - name: Show User groups
       ansible.builtin.debug:
-        msg: "Ubuntu user belogs to groups: {{ ubuntu_groups.stdout }}"
+        msg: "{{ item.item }} belongs to groups: {{ item.stdout }}"
+      loop: "{{ user_groups.results }}"
+
+    - name: Reboot the server
+      reboot:
+        msg: "Rebooting after group change"
+        connect_timeout: 5
+        reboot_timeout: 120
+        pre_reboot_delay: 5
+        post_reboot_delay: 30      
