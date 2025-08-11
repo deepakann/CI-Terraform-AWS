@@ -7,7 +7,7 @@ pipeline {
         ANSIBLE_HOST_KEY_CHECKING = 'False'
         PLAYBOOK_FILE = 'install_docker.yaml'
         PEM_FILE = credentials('ansible-ssh-key')
-        SECRET_NAME = 'docker_credentials'
+        SECRET_NAME = 'docker_credentials_new'
         REGION = 'us-east-1'
     }
 
