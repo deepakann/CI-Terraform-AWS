@@ -53,7 +53,7 @@ pipeline {
             }
          }
 
-        stage("Docker Login'){
+        stage ("Docker Login') {
             steps{
                 script{
                     // Fetch secret from AWS Secrets Manager
@@ -75,7 +75,7 @@ pipeline {
             }
         }
 
-        stage('Build and Push Docker Image') {
+        stage ('Build and Push Docker Image') {
             steps{
                 sh ""
                     docker build -t ${username}/myapp:latest .
